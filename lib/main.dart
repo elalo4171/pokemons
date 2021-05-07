@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equipos_pokemon/bloc/session/session_bloc.dart';
 import 'package:equipos_pokemon/config/preferences.dart';
 
@@ -30,32 +32,32 @@ class MyApp extends StatelessWidget {
 }
 
 class App extends StatelessWidget {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  NavigatorState get _navigator => _navigatorKey.currentState;
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
-      builder: (context, state) {
-        if (state.userSaved == null) {
-          return MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        }
-        if (!state.userSaved) {
-          return MaterialApp(
-            title: 'Material App',
-            initialRoute: 'register',
-            onGenerateRoute: routes,
-          );
-        }
-        return MaterialApp(
-          title: 'Material App',
-          initialRoute: 'home',
-          onGenerateRoute: routes,
-        );
-      },
+    final _sessionBloc = context.watch<SessionBloc>();
+    return MaterialApp(
+      navigatorKey: _navigatorKey,
+      onGenerateRoute: routes,
+      initialRoute: _sessionBloc.state.userSaved == null
+          ? "launch"
+          : _sessionBloc.state.userSaved
+              ? 'home'
+              : 'register',
+      builder: (context, child) => BlocListener<SessionBloc, SessionState>(
+        listenWhen: (previous, current) =>
+            previous.userSaved != current.userSaved,
+        child: child,
+        listener: (context, state) {
+          if (state.userSaved) {
+            _navigator.pushReplacementNamed('home');
+          } else {
+            _navigator.pushReplacementNamed('register');
+          }
+        },
+      ),
     );
   }
 }

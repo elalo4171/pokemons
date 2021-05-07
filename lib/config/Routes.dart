@@ -1,3 +1,4 @@
+import 'package:equipos_pokemon/pages/launch_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equipos_pokemon/pages/home_page.dart';
@@ -7,6 +8,11 @@ Route Function(RouteSettings) get routes => (RouteSettings settings) {
       Route route;
 
       switch (settings.name) {
+        case "launch":
+          route = MaterialPageRoute(
+              builder: (_) => LaunchPage(),
+              settings: RouteSettings(name: settings.name));
+          break;
         case "home":
           route = MaterialPageRoute(
               builder: (_) => HomePage(),
